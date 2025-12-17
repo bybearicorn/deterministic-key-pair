@@ -1,7 +1,6 @@
 import { words } from "./wordlist.js";
 import { sha256 } from "./sha256.js";
 
-// BIP-39 word count -> entropy bits
 const ENTROPY_BITS_BY_WORDS = {
   12: 128,
   15: 160,

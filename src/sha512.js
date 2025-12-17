@@ -1,271 +1,278 @@
+// sha512.js (BIP-39/PBKDF2 kompatibilné, čisté JS, synchronné)
+// Pozn.: potrebuje BigInt (Node >=10+, moderné browsre, Expo/Hermes s BigInt).
+
+const MASK_64 = (1n << 64n) - 1n;
+
 const K = [
-  0x428a2f98, 0xd728ae22, 0x71374491, 0x23ef65cd, 0xb5c0fbcf, 0xec4d3b2f,
-  0xe9b5dba5, 0x8189dbbc, 0x3956c25b, 0xf348b538, 0x59f111f1, 0xb605d019,
-  0x923f82a4, 0xaf194f9b, 0xab1c5ed5, 0xda6d8118, 0xd807aa98, 0xa3030242,
-  0x12835b01, 0x45706fbe, 0x243185be, 0x4ee4b28c, 0x550c7dc3, 0xd5ffb4e2,
-  0x72be5d74, 0xf27b896f, 0x80deb1fe, 0x3b1696b1, 0x9bdc06a7, 0x25c71235,
-  0xc19bf174, 0xcf692694, 0xe49b69c1, 0x9ef14ad2, 0xefbe4786, 0x384f25e3,
-  0x0fc19dc6, 0x8b8cd5b5, 0x240ca1cc, 0x77ac9c65, 0x2de92c6f, 0x592b0275,
-  0x4a7484aa, 0x6ea6e483, 0x5cb0a9dc, 0xbd41fbd4, 0x76f988da, 0x831153b5,
-  0x983e5152, 0xee66dfab, 0xa831c66d, 0x2db43210, 0xb00327c8, 0x98fb213f,
-  0xbf597fc7, 0xbeef0ee4, 0xc6e00bf3, 0x3da88fc2, 0xd5a79147, 0x930aa725,
-  0x06ca6351, 0xe003826f, 0x14292967, 0x0a0e6e70, 0x27b70a85, 0x46d22ffc,
-  0x2e1b2138, 0x5c26c926, 0x4d2c6dfc, 0x5ac42aed, 0x53380d13, 0x9d95b3df,
-  0x650a7354, 0x8baf63de, 0x766a0abb, 0x3c77b2a8, 0x81c2c92e, 0x47edaee6,
-  0x92722c85, 0x1482353b, 0xa2bfe8a1, 0x4cf10364, 0xa81a664b, 0xbc423001,
-  0xc24b8b70, 0xd0f89791, 0xc76c51a3, 0x0654be30, 0xd192e819, 0xd6ef5218,
-  0xd6990624, 0x5565a910, 0xf40e3585, 0x5771202a, 0x106aa070, 0x32bbd1b8,
-  0x19a4c116, 0xb8d2d0c8, 0x1e376c08, 0x5141ab53, 0x2748774c, 0xdf8eeb99,
-  0x34b0bcb5, 0xe19b48a8, 0x391c0cb3, 0xc5c95a63, 0x4ed8aa4a, 0xe3418acb,
-  0x5b9cca4f, 0x7763e373, 0x682e6ff3, 0xd6b2b8a3, 0x748f82ee, 0x5defb2fc,
-  0x78a5636f, 0x43172f60, 0x84c87814, 0xa1f0ab72, 0x8cc70208, 0x1a6439ec,
-  0x90befffa, 0x23631e28, 0xa4506ceb, 0xde82bde9, 0xbef9a3f7, 0xb2c67915,
-  0xc67178f2, 0xe372532b,
+  0x428a2f98d728ae22n,
+  0x7137449123ef65cdn,
+  0xb5c0fbcfec4d3b2fn,
+  0xe9b5dba58189dbbcn,
+  0x3956c25bf348b538n,
+  0x59f111f1b605d019n,
+  0x923f82a4af194f9bn,
+  0xab1c5ed5da6d8118n,
+  0xd807aa98a3030242n,
+  0x12835b0145706fben,
+  0x243185be4ee4b28cn,
+  0x550c7dc3d5ffb4e2n,
+  0x72be5d74f27b896fn,
+  0x80deb1fe3b1696b1n,
+  0x9bdc06a725c71235n,
+  0xc19bf174cf692694n,
+  0xe49b69c19ef14ad2n,
+  0xefbe4786384f25e3n,
+  0x0fc19dc68b8cd5b5n,
+  0x240ca1cc77ac9c65n,
+  0x2de92c6f592b0275n,
+  0x4a7484aa6ea6e483n,
+  0x5cb0a9dcbd41fbd4n,
+  0x76f988da831153b5n,
+  0x983e5152ee66dfabn,
+  0xa831c66d2db43210n,
+  0xb00327c898fb213fn,
+  0xbf597fc7beef0ee4n,
+  0xc6e00bf33da88fc2n,
+  0xd5a79147930aa725n,
+  0x06ca6351e003826fn,
+  0x142929670a0e6e70n,
+  0x27b70a8546d22ffcn,
+  0x2e1b21385c26c926n,
+  0x4d2c6dfc5ac42aedn,
+  0x53380d139d95b3dfn,
+  0x650a73548baf63den,
+  0x766a0abb3c77b2a8n,
+  0x81c2c92e47edaee6n,
+  0x92722c851482353bn,
+  0xa2bfe8a14cf10364n,
+  0xa81a664bbc423001n,
+  0xc24b8b70d0f89791n,
+  0xc76c51a30654be30n,
+  0xd192e819d6ef5218n,
+  0xd69906245565a910n,
+  0xf40e35855771202an,
+  0x106aa07032bbd1b8n,
+  0x19a4c116b8d2d0c8n,
+  0x1e376c085141ab53n,
+  0x2748774cdf8eeb99n,
+  0x34b0bcb5e19b48a8n,
+  0x391c0cb3c5c95a63n,
+  0x4ed8aa4ae3418acbn,
+  0x5b9cca4f7763e373n,
+  0x682e6ff3d6b2b8a3n,
+  0x748f82ee5defb2fcn,
+  0x78a5636f43172f60n,
+  0x84c87814a1f0ab72n,
+  0x8cc702081a6439ecn,
+  0x90befffa23631e28n,
+  0xa4506cebde82bde9n,
+  0xbef9a3f7b2c67915n,
+  0xc67178f2e372532bn,
+  0xca273eceea26619cn,
+  0xd186b8c721c0c207n,
+  0xeada7dd6cde0eb1en,
+  0xf57d4f7fee6ed178n,
+  0x06f067aa72176fban,
+  0x0a637dc5a2c898a6n,
+  0x113f9804bef90daen,
+  0x1b710b35131c471bn,
+  0x28db77f523047d84n,
+  0x32caab7b40c72493n,
+  0x3c9ebe0a15c9bebcn,
+  0x431d67c49c100d4cn,
+  0x4cc5d4becb3e42b6n,
+  0x597f299cfc657e2an,
+  0x5fcb6fab3ad6faecn,
+  0x6c44198c4a475817n,
 ];
 
-const HINIT = [
-  0x6a09e667, 0xf3bcc908, 0xbb67ae85, 0x84caa73b, 0x3c6ef372, 0xfe94f82b,
-  0xa54ff53a, 0x5f1d36f1, 0x510e527f, 0xade682d1, 0x9b05688c, 0x2b3e6c1f,
-  0x1f83d9ab, 0xfb41bd6b, 0x5be0cd19, 0x137e2179,
-];
-
-function utf8ToBytes(str) {
-  return new TextEncoder().encode(str);
+function rotr(x, n) {
+  return ((x >> BigInt(n)) | (x << BigInt(64 - n))) & MASK_64;
 }
-function toBytes(x) {
-  if (x instanceof Uint8Array) return x;
-  if (typeof x === "string") return utf8ToBytes(x);
-  throw new Error("Expected string or Uint8Array");
-}
-function concat(a, b) {
-  const out = new Uint8Array(a.length + b.length);
-  out.set(a, 0);
-  out.set(b, a.length);
-  return out;
+function shr(x, n) {
+  return x >> BigInt(n);
 }
 
-// 64-bit helpers using (hi, lo) 32-bit unsigned
-function add64(ah, al, bh, bl) {
-  const lo = (al + bl) >>> 0;
-  const carry = lo < al ? 1 : 0;
-  const hi = (ah + bh + carry) >>> 0;
-  return [hi, lo];
+function Ch(x, y, z) {
+  return (x & y) ^ (~x & z);
 }
-function add64_4(aH, aL, bH, bL, cH, cL, dH, dL) {
-  let hi = aH,
-    lo = aL;
-  [hi, lo] = add64(hi, lo, bH, bL);
-  [hi, lo] = add64(hi, lo, cH, cL);
-  [hi, lo] = add64(hi, lo, dH, dL);
-  return [hi, lo];
+function Maj(x, y, z) {
+  return (x & y) ^ (x & z) ^ (y & z);
 }
-function add64_5(aH, aL, bH, bL, cH, cL, dH, dL, eH, eL) {
-  let hi = aH,
-    lo = aL;
-  [hi, lo] = add64(hi, lo, bH, bL);
-  [hi, lo] = add64(hi, lo, cH, cL);
-  [hi, lo] = add64(hi, lo, dH, dL);
-  [hi, lo] = add64(hi, lo, eH, eL);
-  return [hi, lo];
+function Sigma0(x) {
+  return rotr(x, 28) ^ rotr(x, 34) ^ rotr(x, 39);
 }
-function rotr64(h, l, n) {
-  n &= 63;
-  if (n === 0) return [h, l];
-  if (n < 32) {
-    return [
-      ((h >>> n) | (l << (32 - n))) >>> 0,
-      ((l >>> n) | (h << (32 - n))) >>> 0,
-    ];
+function Sigma1(x) {
+  return rotr(x, 14) ^ rotr(x, 18) ^ rotr(x, 41);
+}
+function sigma0(x) {
+  return rotr(x, 1) ^ rotr(x, 8) ^ shr(x, 7);
+}
+function sigma1(x) {
+  return rotr(x, 19) ^ rotr(x, 61) ^ shr(x, 6);
+}
+
+function add64(...xs) {
+  let s = 0n;
+  for (const x of xs) s = (s + x) & MASK_64;
+  return s;
+}
+
+function utf8Encode(str) {
+  // bez TextEncoder fallback
+  const out = [];
+  for (let i = 0; i < str.length; i++) {
+    let c = str.charCodeAt(i);
+    if (c < 0x80) out.push(c);
+    else if (c < 0x800) {
+      out.push(0xc0 | (c >> 6), 0x80 | (c & 0x3f));
+    } else if (c >= 0xd800 && c <= 0xdbff) {
+      // surrogate pair
+      const c2 = str.charCodeAt(++i);
+      const cp = 0x10000 + ((c - 0xd800) << 10) + (c2 - 0xdc00);
+      out.push(
+        0xf0 | (cp >> 18),
+        0x80 | ((cp >> 12) & 0x3f),
+        0x80 | ((cp >> 6) & 0x3f),
+        0x80 | (cp & 0x3f),
+      );
+    } else {
+      out.push(0xe0 | (c >> 12), 0x80 | ((c >> 6) & 0x3f), 0x80 | (c & 0x3f));
+    }
   }
-  if (n === 32) return [l, h];
-  n -= 32;
-  return [
-    ((l >>> n) | (h << (32 - n))) >>> 0,
-    ((h >>> n) | (l << (32 - n))) >>> 0,
-  ];
-}
-function shr64(h, l, n) {
-  if (n === 0) return [h, l];
-  if (n < 32) return [h >>> n, ((l >>> n) | (h << (32 - n))) >>> 0];
-  if (n === 32) return [0, h];
-  return [0, h >>> (n - 32)];
+  return new Uint8Array(out);
 }
 
-function Ch(eH, eL, fH, fL, gH, gL) {
-  return [((eH & fH) ^ (~eH & gH)) >>> 0, ((eL & fL) ^ (~eL & gL)) >>> 0];
+function toBytes(msg) {
+  if (msg instanceof Uint8Array) return msg;
+  if (typeof msg === "string") return utf8Encode(msg);
+  throw new TypeError("sha512: msg must be string or Uint8Array");
 }
-function Maj(aH, aL, bH, bL, cH, cL) {
-  return [
-    ((aH & bH) ^ (aH & cH) ^ (bH & cH)) >>> 0,
-    ((aL & bL) ^ (aL & cL) ^ (bL & cL)) >>> 0,
-  ];
+
+function readUint64BE(bytes, off) {
+  let x = 0n;
+  for (let i = 0; i < 8; i++) x = (x << 8n) | BigInt(bytes[off + i]);
+  return x;
 }
-function Sigma0(aH, aL) {
-  const [r28H, r28L] = rotr64(aH, aL, 28);
-  const [r34H, r34L] = rotr64(aH, aL, 34);
-  const [r39H, r39L] = rotr64(aH, aL, 39);
-  return [(r28H ^ r34H ^ r39H) >>> 0, (r28L ^ r34L ^ r39L) >>> 0];
-}
-function Sigma1(eH, eL) {
-  const [r14H, r14L] = rotr64(eH, eL, 14);
-  const [r18H, r18L] = rotr64(eH, eL, 18);
-  const [r41H, r41L] = rotr64(eH, eL, 41);
-  return [(r14H ^ r18H ^ r41H) >>> 0, (r14L ^ r18L ^ r41L) >>> 0];
-}
-function sigma0(wH, wL) {
-  const [r1H, r1L] = rotr64(wH, wL, 1);
-  const [r8H, r8L] = rotr64(wH, wL, 8);
-  const [s7H, s7L] = shr64(wH, wL, 7);
-  return [(r1H ^ r8H ^ s7H) >>> 0, (r1L ^ r8L ^ s7L) >>> 0];
-}
-function sigma1(wH, wL) {
-  const [r19H, r19L] = rotr64(wH, wL, 19);
-  const [r61H, r61L] = rotr64(wH, wL, 61);
-  const [s6H, s6L] = shr64(wH, wL, 6);
-  return [(r19H ^ r61H ^ s6H) >>> 0, (r19L ^ r61L ^ s6L) >>> 0];
+
+function writeUint64BE(bytes, off, x) {
+  for (let i = 7; i >= 0; i--) {
+    bytes[off + i] = Number(x & 0xffn);
+    x >>= 8n;
+  }
 }
 
 export function sha512(msg) {
   const m = toBytes(msg);
+  const bitLen = BigInt(m.length) * 8n;
 
-  // padding
-  const bitLen = m.length * 8;
-  const padded = new Uint8Array(((m.length + 17 + 127) >> 7) << 7);
-  padded.set(m);
-  padded[m.length] = 0x80;
+  // padding: 1 bit + zeros until len ≡ 896 mod 1024, then 128-bit length
+  const withOneLen = m.length + 1;
+  const mod = withOneLen % 128;
+  const padZeros = mod <= 112 ? 112 - mod : 112 + (128 - mod);
+  const totalLen = withOneLen + padZeros + 16;
 
-  const dv = new DataView(padded.buffer);
-  // high 64 bits of length = 0 for typical inputs
-  dv.setUint32(padded.length - 16, 0, false);
-  dv.setUint32(padded.length - 12, 0, false);
-  dv.setUint32(padded.length - 8, Math.floor(bitLen / 0x100000000), false);
-  dv.setUint32(padded.length - 4, bitLen >>> 0, false);
+  const data = new Uint8Array(totalLen);
+  data.set(m, 0);
+  data[m.length] = 0x80;
 
-  // state
-  const H = HINIT.slice();
+  // length as 128-bit big-endian: high 64 then low 64
+  const hi = (bitLen >> 64n) & MASK_64;
+  const lo = bitLen & MASK_64;
+  writeUint64BE(data, totalLen - 16, hi);
+  writeUint64BE(data, totalLen - 8, lo);
 
-  const W = new Uint32Array(160); // 80 * 2 (hi,lo)
+  let H0 = 0x6a09e667f3bcc908n;
+  let H1 = 0xbb67ae8584caa73bn;
+  let H2 = 0x3c6ef372fe94f82bn;
+  let H3 = 0xa54ff53a5f1d36f1n;
+  let H4 = 0x510e527fade682d1n;
+  let H5 = 0x9b05688c2b3e6c1fn;
+  let H6 = 0x1f83d9abfb41bd6bn;
+  let H7 = 0x5be0cd19137e2179n;
 
-  for (let i = 0; i < padded.length; i += 128) {
-    // init W[0..15]
-    for (let t = 0; t < 16; t++) {
-      const off = i + t * 8;
-      W[t * 2] = dv.getUint32(off, false);
-      W[t * 2 + 1] = dv.getUint32(off + 4, false);
-    }
-    // extend W[16..79]
+  const W = new Array(80).fill(0n);
+
+  for (let off = 0; off < data.length; off += 128) {
+    for (let t = 0; t < 16; t++) W[t] = readUint64BE(data, off + t * 8);
     for (let t = 16; t < 80; t++) {
-      const w15H = W[(t - 15) * 2],
-        w15L = W[(t - 15) * 2 + 1];
-      const w2H = W[(t - 2) * 2],
-        w2L = W[(t - 2) * 2 + 1];
-      const w16H = W[(t - 16) * 2],
-        w16L = W[(t - 16) * 2 + 1];
-      const w7H = W[(t - 7) * 2],
-        w7L = W[(t - 7) * 2 + 1];
-
-      const [s0H, s0L] = sigma0(w15H, w15L);
-      const [s1H, s1L] = sigma1(w2H, w2L);
-
-      let [tmpH, tmpL] = add64_4(w16H, w16L, s0H, s0L, w7H, w7L, s1H, s1L);
-      W[t * 2] = tmpH;
-      W[t * 2 + 1] = tmpL;
+      W[t] = add64(sigma1(W[t - 2]), W[t - 7], sigma0(W[t - 15]), W[t - 16]);
     }
 
-    // working vars a..h (each hi,lo)
-    let aH = H[0],
-      aL = H[1];
-    let bH = H[2],
-      bL = H[3];
-    let cH = H[4],
-      cL = H[5];
-    let dH = H[6],
-      dL = H[7];
-    let eH = H[8],
-      eL = H[9];
-    let fH = H[10],
-      fL = H[11];
-    let gH = H[12],
-      gL = H[13];
-    let hH = H[14],
-      hL = H[15];
+    let a = H0,
+      b = H1,
+      c = H2,
+      d = H3,
+      e = H4,
+      f = H5,
+      g = H6,
+      h = H7;
 
     for (let t = 0; t < 80; t++) {
-      const [S1H, S1L] = Sigma1(eH, eL);
-      const [chH, chL] = Ch(eH, eL, fH, fL, gH, gL);
-
-      const kH = K[t * 2],
-        kL = K[t * 2 + 1];
-      const wH = W[t * 2],
-        wL = W[t * 2 + 1];
-
-      const [t1H, t1L] = add64_5(hH, hL, S1H, S1L, chH, chL, kH, kL, wH, wL);
-
-      const [S0H, S0L] = Sigma0(aH, aL);
-      const [majH, majL] = Maj(aH, aL, bH, bL, cH, cL);
-      const [t2H, t2L] = add64(S0H, S0L, majH, majL);
-
-      hH = gH;
-      hL = gL;
-      gH = fH;
-      gL = fL;
-      fH = eH;
-      fL = eL;
-
-      [eH, eL] = add64(dH, dL, t1H, t1L);
-
-      dH = cH;
-      dL = cL;
-      cH = bH;
-      cL = bL;
-      bH = aH;
-      bL = aL;
-
-      [aH, aL] = add64(t1H, t1L, t2H, t2L);
+      const T1 = add64(h, Sigma1(e), Ch(e, f, g), K[t], W[t]);
+      const T2 = add64(Sigma0(a), Maj(a, b, c));
+      h = g;
+      g = f;
+      f = e;
+      e = add64(d, T1);
+      d = c;
+      c = b;
+      b = a;
+      a = add64(T1, T2);
     }
 
-    // add to state
-    [H[0], H[1]] = add64(H[0], H[1], aH, aL);
-    [H[2], H[3]] = add64(H[2], H[3], bH, bL);
-    [H[4], H[5]] = add64(H[4], H[5], cH, cL);
-    [H[6], H[7]] = add64(H[6], H[7], dH, dL);
-    [H[8], H[9]] = add64(H[8], H[9], eH, eL);
-    [H[10], H[11]] = add64(H[10], H[11], fH, fL);
-    [H[12], H[13]] = add64(H[12], H[13], gH, gL);
-    [H[14], H[15]] = add64(H[14], H[15], hH, hL);
+    H0 = add64(H0, a);
+    H1 = add64(H1, b);
+    H2 = add64(H2, c);
+    H3 = add64(H3, d);
+    H4 = add64(H4, e);
+    H5 = add64(H5, f);
+    H6 = add64(H6, g);
+    H7 = add64(H7, h);
   }
 
-  // output
   const out = new Uint8Array(64);
-  const ov = new DataView(out.buffer);
-  for (let i = 0; i < 16; i++) ov.setUint32(i * 4, H[i], false);
+  writeUint64BE(out, 0, H0);
+  writeUint64BE(out, 8, H1);
+  writeUint64BE(out, 16, H2);
+  writeUint64BE(out, 24, H3);
+  writeUint64BE(out, 32, H4);
+  writeUint64BE(out, 40, H5);
+  writeUint64BE(out, 48, H6);
+  writeUint64BE(out, 56, H7);
   return out;
 }
 
 export function hmac(key, message) {
-  const blockSize = 128;
-  let keyBytes = toBytes(key);
-  const msgBytes = toBytes(message);
+  const k = toBytes(key);
+  const m = toBytes(message);
 
-  if (keyBytes.length > blockSize) keyBytes = sha512(keyBytes);
+  const blockSize = 128;
+  let keyBlock = k;
+
+  if (keyBlock.length > blockSize) keyBlock = sha512(keyBlock);
+  if (keyBlock.length < blockSize) {
+    const tmp = new Uint8Array(blockSize);
+    tmp.set(keyBlock);
+    keyBlock = tmp;
+  }
 
   const oKeyPad = new Uint8Array(blockSize);
   const iKeyPad = new Uint8Array(blockSize);
-
   for (let i = 0; i < blockSize; i++) {
-    const b = keyBytes[i] || 0;
-    iKeyPad[i] = b ^ 0x36;
-    oKeyPad[i] = b ^ 0x5c;
+    oKeyPad[i] = keyBlock[i] ^ 0x5c;
+    iKeyPad[i] = keyBlock[i] ^ 0x36;
   }
 
-  const inner = sha512(concat(iKeyPad, msgBytes));
-  return sha512(concat(oKeyPad, inner));
+  const inner = new Uint8Array(blockSize + m.length);
+  inner.set(iKeyPad, 0);
+  inner.set(m, blockSize);
+
+  const innerHash = sha512(inner);
+
+  const outer = new Uint8Array(blockSize + innerHash.length);
+  outer.set(oKeyPad, 0);
+  outer.set(innerHash, blockSize);
+
+  return sha512(outer);
 }
-
-hmac.array = (k, m) => Array.from(hmac(k, m));
-hmac.hex = (k, m) =>
-  Array.from(hmac(k, m))
-    .map((b) => b.toString(16).padStart(2, "0"))
-    .join("");
-
-export default sha512;

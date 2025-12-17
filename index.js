@@ -6,7 +6,7 @@ const mnemonicWords = getRandomMnemonic(12);
 const mnemonic = mnemonicWords.join(" ");
 console.info("mnemonic:", mnemonic);
 
-const passphrase = "";
+const passphrase = "asd";
 const password = mnemonic.normalize("NFKD");
 const salt = ("mnemonic" + passphrase).normalize("NFKD");
 
