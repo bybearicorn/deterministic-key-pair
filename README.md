@@ -1,3 +1,9 @@
+State of implementation:
+ - In Progress, last update Dec 2025
+
+Estimated finished package:
+ - February 2026
+
 ### The goal of this package is to define a **deterministic and reproducible method for generating cryptographic key pairs** that is suitable for long-term offline storage and later recovery.
 
 Standard key generation relies on randomness at creation time, which is cryptographically sound but operationally fragile when keys must be recreated or stored outside digital systems. Storing raw private keys in textual or visual form is highly error-prone. A single missing or altered character in a hexadecimal string renders the key unusable. Visual encodings such as QR codes offer limited error correction but are not designed for archival storage under physical degradation or partial loss.
@@ -11,3 +17,6 @@ The resulting key pairs are **deterministically recreatable**, resistant to huma
 Criteria:
 - Zero dependencies
 - Well tested
+- Compatibile with crypto cold storage wallets
+- Post-quantum ready
+- Prefers 512 bits of entropy
