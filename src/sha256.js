@@ -625,14 +625,12 @@ HmacSha256.prototype.finalize = function () {
   }
 };
 
-// Public API (same shape as original library)
 const api = createMethod();
 api.sha256 = api;
 api.sha224 = createMethod(true);
 api.sha256.hmac = createHmacMethod();
 api.sha224.hmac = createHmacMethod(true);
 
-// Exports
 export default api.sha256;
 export const sha256 = api.sha256;
 export const sha224 = api.sha224;

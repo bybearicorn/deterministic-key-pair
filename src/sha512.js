@@ -1,5 +1,4 @@
-// sha512.js (BIP-39/PBKDF2 kompatibilné, čisté JS, synchronné)
-// Pozn.: potrebuje BigInt (Node >=10+, moderné browsre, Expo/Hermes s BigInt).
+"use strict";
 
 const MASK_64 = (1n << 64n) - 1n;
 
@@ -119,7 +118,6 @@ function add64(...xs) {
 }
 
 function utf8Encode(str) {
-  // bez TextEncoder fallback
   const out = [];
   for (let i = 0; i < str.length; i++) {
     let c = str.charCodeAt(i);
@@ -127,7 +125,6 @@ function utf8Encode(str) {
     else if (c < 0x800) {
       out.push(0xc0 | (c >> 6), 0x80 | (c & 0x3f));
     } else if (c >= 0xd800 && c <= 0xdbff) {
-      // surrogate pair
       const c2 = str.charCodeAt(++i);
       const cp = 0x10000 + ((c - 0xd800) << 10) + (c2 - 0xdc00);
       out.push(
@@ -166,7 +163,6 @@ export function sha512(msg) {
   const m = toBytes(msg);
   const bitLen = BigInt(m.length) * 8n;
 
-  // padding: 1 bit + zeros until len ≡ 896 mod 1024, then 128-bit length
   const withOneLen = m.length + 1;
   const mod = withOneLen % 128;
   const padZeros = mod <= 112 ? 112 - mod : 112 + (128 - mod);
@@ -176,7 +172,6 @@ export function sha512(msg) {
   data.set(m, 0);
   data[m.length] = 0x80;
 
-  // length as 128-bit big-endian: high 64 then low 64
   const hi = (bitLen >> 64n) & MASK_64;
   const lo = bitLen & MASK_64;
   writeUint64BE(data, totalLen - 16, hi);

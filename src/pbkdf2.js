@@ -42,8 +42,6 @@ export function pbkdf2Hmac({
   return DK;
 }
 
-// -------- internal utils --------
-
 function int32be(i) {
   return new Uint8Array([
     (i >>> 24) & 0xff,

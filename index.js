@@ -1,6 +1,7 @@
 import { getRandomMnemonic } from "./src/shuffle.js";
 import { pbkdf2Hmac } from "./src/pbkdf2.js";
 import { hmac as hmacSha512 } from "./src/sha512.js";
+import { keypairFromSeed } from "./src/key.js";
 
 const mnemonicWords = getRandomMnemonic(12);
 const mnemonic = mnemonicWords.join(" ");
@@ -21,3 +22,14 @@ const seed = pbkdf2Hmac({
 
 const seedHex = [...seed].map((b) => b.toString(16).padStart(2, "0")).join("");
 console.info("seed(hex):", seedHex);
+
+const { privateKey, publicKey } = keypairFromSeed(seed, "app:v1:encryption");
+
+console.info(
+  "priv(hex):",
+  [...privateKey].map((b) => b.toString(16).padStart(2, "0")).join(""),
+);
+console.info(
+  "pub(hex):",
+  [...publicKey].map((b) => b.toString(16).padStart(2, "0")).join(""),
+);
