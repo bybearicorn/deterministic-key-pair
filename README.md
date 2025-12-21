@@ -6,7 +6,7 @@ Estimated finished package:
 
 
 Run
-```
+```node
 import { secureGenerateKeyGen } from "deterministic-key-pair";
 
 const instance = secureGenerateKeyGen();
@@ -25,7 +25,7 @@ console.info("public key in hex", instance.publicKey);
 ```
 
 Options
-```
+```node
 const instance = secureGenerateKeyGen({
   passphrase: "Hello World", // works as 13th word of mnemonic
   mnemonicLength: 12, // 12, 15, 18, 21, 24
