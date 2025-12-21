@@ -6,6 +6,7 @@
     "keygen": "./index.js"
   },
   "scripts": {
-    "keygen": "keygen"
+    "keygen": "keygen",
+    "test": "./tests/test.js"
   }
 }
