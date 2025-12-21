@@ -3,7 +3,7 @@
   "version": "1.1.0",
   "type": "module",
   "bin": {
-    "keygen": "./index.js"
+    "keygen": "./src/index.js"
   },
   "scripts": {
     "keygen": "keygen",
