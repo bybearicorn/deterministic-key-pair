@@ -1,4 +1,4 @@
-Run
+### Run
 ```node
 import { secureGenerateKeyGen } from "deterministic-key-pair";
 
@@ -12,7 +12,7 @@ const instance = secureGenerateKeyGen();
 }
 ```
 
-Options
+### Options
 ```node
 const instance = secureGenerateKeyGen({
   passphrase: "Hello World", // works as 13th word of mnemonic
@@ -31,7 +31,7 @@ By building on the BIP39 standard, this package deliberately reuses a **widely r
 
 The resulting key pairs are **deterministically recreatable**, resistant to human transcription errors, and suitable for long-term offline storage without reducing cryptographic strength. When combined with high-quality entropy, fixed derivation parameters, and optional passphrases, the security level is bounded by 128–256 bits of entropy, which is sufficient even for high-assurance environments such as defense or critical infrastructure.
 
-Criteria:
+### Criteria:
 - Zero dependencies
 - Well tested
 - Compatibile with crypto cold storage wallets
