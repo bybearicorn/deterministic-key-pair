@@ -1,4 +1,6 @@
-### Run
+### Secure Generate Key Gen
+Generates whole object including all options
+
 ```node
 import { secureGenerateKeyGen } from "deterministic-key-pair";
 
@@ -10,6 +12,19 @@ const instance = secureGenerateKeyGen();
  privateKey: "38c450b392bce2e8f40eaf5f002edba0ca0f619a90e2d6bc4f440efc1b60c2ab",
  publicKey: "02898c337e083223a9e3dea3d8209ff407b327e73693cdf08ae2ca0edee0204153"
 }
+```
+
+### Get Key Pair From Mnemonic
+Generates private and public key from existing mnemonic
+
+```node
+const instance = getKeyPairFromMnemonic({
+  mnemonic:
+    "divert rule embody mystery direct develop quality injury miracle only member voyage",
+});
+
+console.info("private key in hex", instance.privateKey);
+console.info("public key in hex", instance.publicKey);
 ```
 
 ### Options
