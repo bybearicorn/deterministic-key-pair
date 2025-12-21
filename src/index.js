@@ -36,11 +36,11 @@ const exportPublicKey = [...publicKey]
   .map((b) => b.toString(16).padStart(2, "0"))
   .join("");
 
-export function secureGenerateKeyGen(
+export function secureGenerateKeyGen({
   passphrase = "",
   mnemonicLength = 12,
   ownEntropyString = undefined,
-) {
+}) {
   // allow only valid BIP39 sizes (optional but strongly recommended)
   const allowedMnemonicLengths = [12, 15, 18, 21, 24];
   if (
@@ -49,6 +49,8 @@ export function secureGenerateKeyGen(
   ) {
     throw new TypeError("mnemonicLength must be one of 12, 15, 18, 21, 24");
   }
+
+  console.info("passphrase", passphrase);
 
   // passphrase: must be a primitive string
   if (typeof passphrase !== "string") {
