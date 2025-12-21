@@ -1,10 +1,3 @@
-State of implementation:
- - In Progress, last update Dec 2025
-
-Estimated finished package:
- - February 2026
-
-
 Run
 ```node
 import { secureGenerateKeyGen } from "deterministic-key-pair";
