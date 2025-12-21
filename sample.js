@@ -6,7 +6,7 @@ const instance = secureGenerateKeyGen({
   ownEnthropyString: Math.random() + "",
 });
 
-console.info("12 words", instance.mnemonic);
+console.info("12 words", instance.mnemonicString);
 console.info("hex seed", instance.seed);
 console.info("private key in hex", instance.privateKey);
 console.info("public key in hex", instance.publicKey);

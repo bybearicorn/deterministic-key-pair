@@ -4,17 +4,12 @@ import { secureGenerateKeyGen } from "deterministic-key-pair";
 
 const instance = secureGenerateKeyGen();
 
-console.info("12 words", instance.mnemonic);
-// divert rule embody mystery direct develop quality injury miracle only member voyage
-
-console.info("hex seed", instance.seed);
-// 4f47074d6cbe3a363c756f2d2b84a8e2063ffd4513e30a5e53f93b1a30d976d1ff06246728b525ecac93ed46790f7b4fc35046105d5c396c88c9f123c4ce8511
-
-console.info("private key in hex", instance.privateKey);
-// 38c450b392bce2e8f40eaf5f002edba0ca0f619a90e2d6bc4f440efc1b60c2ab
-
-console.info("public key in hex", instance.publicKey);
-// 02898c337e083223a9e3dea3d8209ff407b327e73693cdf08ae2ca0edee0204153
+{
+ mnemonicString: "divert rule embody mystery direct develop quality injury miracle only member voyage",
+ seed: "4f47074d6cbe3a363c756f2d2b84a8e2063ffd4513e30a5e53f93b1a30d976d1ff06246728b525ecac93ed46790f7b4fc35046105d5c396c88c9f123c4ce8511",
+ privateKey: "38c450b392bce2e8f40eaf5f002edba0ca0f619a90e2d6bc4f440efc1b60c2ab",
+ publicKey: "02898c337e083223a9e3dea3d8209ff407b327e73693cdf08ae2ca0edee0204153"
+}
 ```
 
 Options

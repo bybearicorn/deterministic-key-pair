@@ -68,7 +68,7 @@ export function secureGenerateKeyGen({
   }
 
   return {
-    mnemonic: exportMnemonic,
+    mnemonicString: exportMnemonic,
     seed: exportSeedAsHex,
     privateKey: exportPrivateKey,
     publicKey: exportPublicKey,
