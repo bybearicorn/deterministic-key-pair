@@ -9,7 +9,7 @@ By building on the BIP39 standard, this package deliberately reuses a **widely r
 The resulting key pairs are **deterministically recreatable**, resistant to human transcription errors, and suitable for long-term offline storage without reducing cryptographic strength. When combined with high-quality entropy, fixed derivation parameters, and optional passphrases, the security level is bounded by 128–256 bits of entropy, which is sufficient even for high-assurance environments such as defense or critical infrastructure.
 
 ### Criteria:
-- Zero dependencies to avoid vendor attacks
+- Self-contained with zero dependencies
 - 100% code coverag
 - Compatible with BIP39 and Bitcoin seed specification
 - Post-quantum ready
