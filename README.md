@@ -4,6 +4,12 @@ State of implementation:
 Estimated finished package:
  - February 2026
 
+
+Run
+```
+npx keygen
+```
+
 ### The goal of this package is to define a **deterministic and reproducible method for generating cryptographic key pairs** that is suitable for long-term offline storage and later recovery.
 
 Standard key generation relies on randomness at creation time, which is cryptographically sound but operationally fragile when keys must be recreated or stored outside digital systems. Storing raw private keys in textual or visual form is highly error-prone. A single missing or altered character in a hexadecimal string renders the key unusable. Visual encodings such as QR codes offer limited error correction but are not designed for archival storage under physical degradation or partial loss.

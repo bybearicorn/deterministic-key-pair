@@ -1,3 +1,5 @@
+#!/usr/bin/env node
+
 import { getRandomMnemonic } from "./src/shuffle.js";
 import { pbkdf2Hmac } from "./src/pbkdf2.js";
 import { hmac as hmacSha512 } from "./src/sha512.js";
@@ -7,7 +9,7 @@ const mnemonicWords = getRandomMnemonic(12);
 const mnemonic = mnemonicWords.join(" ");
 console.info("mnemonic:", mnemonic);
 
-const passphrase = "asd";
+const passphrase = "secret password required by user";
 const password = mnemonic.normalize("NFKD");
 const salt = ("mnemonic" + passphrase).normalize("NFKD");
 

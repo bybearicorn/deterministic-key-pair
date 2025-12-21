@@ -1,12 +1,11 @@
 {
   "name": "deterministic-key-pair",
   "version": "1.1.0",
-  "description": "A deterministic and reproducible method for generating cryptographic key pairs",
-  "main": "index.js",
   "type": "module",
-  "repository": {
-    "type": "git",
-    "url": "https://github.com/bybearicorn/deterministic-key-pair"
+  "bin": {
+    "keygen": "./index.js"
   },
-  "homepage": "https://bearicorn.com"
+  "scripts": {
+    "keygen": "keygen"
+  }
 }
