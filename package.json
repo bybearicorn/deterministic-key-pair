@@ -7,6 +7,6 @@
   },
   "scripts": {
     "keygen": "keygen",
-    "test": "./tests/test.js"
+    "test": "node ./tests/test.js"
   }
 }
