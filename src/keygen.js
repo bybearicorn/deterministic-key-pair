@@ -30,10 +30,10 @@ export function secureGenerateKeyGen({ passphrase = "", mnemonic = null }) {
   const { privateKey, publicKey } = keypairFromSeed(seed, "app:v1:encryption");
 
   return {
+    mnemonic,
     seed: parseToHex(seed),
     privateKey: parseToHex(privateKey),
     publicKey: parseToHex(publicKey),
-    mnemonic,
   };
 }
 

@@ -1,14 +1,14 @@
 import { getMnemonic } from "./libs/mnemonic.js";
 import { secureGenerateKeyGen } from "./keygen.js";
 
-const mnemonic = getMnemonic();
+// different package
+// export function generateMnemonic() {
+//   return mnemonic;
+// }
 
-export function generateMnemonic() {
-  return mnemonic;
+export function generateKeyPairFromMnemonic({ mnemonic, passphrase }) {
+  if (!mnemonic) {
+    mnemonic = getMnemonic();
+  }
+  return secureGenerateKeyGen({ mnemonic, passphrase });
 }
-
-export function getKeypairFromMnemonic() {
-  return secureGenerateKeyGen({ mnemonic });
-}
-
-console.info(secureGenerateKeyGen({ mnemonic }));
