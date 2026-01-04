@@ -1,4 +1,5 @@
-import { getMnemonic } from "./libs/shuffle.js";
+import { getMnemonic } from "./libs/mnemonic.js";
+import { secureGenerateKeyGen } from "./keygen.js";
 
 const mnemonic = getMnemonic();
 
@@ -10,5 +11,8 @@ export function generateMnemonicAsPaddedString() {
   return mnemonic.join(" ").normalize("NFKD");
 }
 
-console.info(generateMnemonic());
-console.info(generateMnemonicAsPaddedString());
+export function getKeypairFromMnemonic() {
+  return secureGenerateKeyGen({ mnemonic });
+}
+
+console.info(secureGenerateKeyGen({ mnemonic }));
