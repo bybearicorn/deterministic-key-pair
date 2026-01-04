@@ -1,13 +1,25 @@
-import { words } from "./wordlist.js";
 import { sha256 } from "./sha256.js";
+import { words } from "./bip39.js";
+import { randomEntropyBytes } from "./random.js";
 
-const ENTROPY_BITS_BY_WORDS = {
-  12: 128,
-  15: 160,
-  18: 192,
-  21: 224,
-  24: 256,
-};
+export function getMnemonic(take = 12) {
+  const ENTROPY_BITS_BY_WORDS = {
+    12: 128,
+    15: 160,
+    18: 192,
+    21: 224,
+    24: 256,
+  };
+
+  const entropyBits = ENTROPY_BITS_BY_WORDS[take];
+
+  if (!entropyBits) {
+    throw new Error("take must be one of: 12, 15, 18, 21, 24");
+  }
+
+  const entropyU8 = randomEntropyBytes(entropyBits / 8);
+  return entropyToMnemonic(entropyU8);
+}
 
 function bytesToBinary(u8) {
   let out = "";
@@ -23,7 +35,7 @@ function deriveChecksumBits(entropyU8) {
   return hashBits.slice(0, csLen);
 }
 
-export function entropyToMnemonic(entropyU8) {
+function entropyToMnemonic(entropyU8) {
   if (!(entropyU8 instanceof Uint8Array))
     throw new TypeError("entropy must be Uint8Array");
 
@@ -43,23 +55,4 @@ export function entropyToMnemonic(entropyU8) {
   if (!chunks) throw new Error("failed to split into 11-bit chunks");
 
   return chunks.map((bin) => words[parseInt(bin, 2)]);
-}
-
-function randomEntropyBytes(byteLen) {
-  const c = globalThis.crypto;
-  if (!c || typeof c.getRandomValues !== "function") {
-    throw new Error("Secure RNG not available: crypto.getRandomValues missing");
-  }
-  const out = new Uint8Array(byteLen);
-  c.getRandomValues(out);
-  return out;
-}
-
-export function getRandomMnemonic(take = 12) {
-  const wc = Number(take);
-  const entropyBits = ENTROPY_BITS_BY_WORDS[wc];
-  if (!entropyBits) throw new Error("take must be one of: 12, 15, 18, 21, 24");
-
-  const entropyU8 = randomEntropyBytes(entropyBits / 8);
-  return entropyToMnemonic(entropyU8);
 }

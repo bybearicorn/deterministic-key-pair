@@ -1,4 +1,4 @@
-import { secureGenerateKeyGen } from "./src/index.js";
+import { secureGenerateKeyGen } from "../src/index.js";
 
 const instance = secureGenerateKeyGen({
   passphrase: "Hello World",
