@@ -15,8 +15,6 @@ export function secureGenerateKeyGen({ passphrase = "", mnemonic = null }) {
 
   const joinedMnemonic = mnemonic.join(" ").normalize("NFKD");
 
-  console.info("joinedMnemonic", joinedMnemonic);
-
   const seed = pbkdf2Hmac({
     hmac: (key, msg) => hmacSha512(key, msg),
     hashLen: 64, // SHA-512 output bytes
@@ -31,14 +29,11 @@ export function secureGenerateKeyGen({ passphrase = "", mnemonic = null }) {
 
   const { privateKey, publicKey } = keypairFromSeed(seed, "app:v1:encryption");
 
-  // const exportPublicKey = [...publicKey]
-  //   .map((b) => b.toString(16).padStart(2, "0"))
-  //   .join("");
-
   return {
     seed: parseToHex(seed),
     privateKey: parseToHex(privateKey),
     publicKey: parseToHex(publicKey),
+    mnemonic,
   };
 }
 
