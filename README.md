@@ -61,3 +61,18 @@ const instance = getKeyPairFromSeed({
  publicKey: "02898c337e083223a9e3dea3d8209ff407b327e73693cdf08ae2ca0edee0204153"
 }
 ```
+
+### Generate a mnemonic and choose length 12, 15, 18, 21, 24
+
+```node
+const mnemonic = generateMnemonic({ length: 12 });
+
+[
+  'govern',  'armed',
+  'diagram', 'primary',
+  'slim',    'light',
+  'merit',   'example',
+  'tree',    'run',
+  'prepare', 'produce'
+]
+```

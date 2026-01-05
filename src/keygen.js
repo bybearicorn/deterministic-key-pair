@@ -1,6 +1,7 @@
 import { pbkdf2Hmac } from "./libs/pbkdf2.js";
 import { hmac as hmacSha512 } from "./libs/sha512.js";
 import { getPublicKey, CURVE_N } from "./libs/secp256k1.js";
+import { convertUint8ToHex, convertHexToUint8 } from "./libs/convert.js";
 
 export function secureGenerateKeyGen({ passphrase = "", mnemonic = null }) {
   if (!mnemonic) {
@@ -15,7 +16,7 @@ export function secureGenerateKeyGen({ passphrase = "", mnemonic = null }) {
 
   const joinedMnemonic = mnemonic.join(" ").normalize("NFKD");
 
-  const seed = pbkdf2Hmac({
+  const seedAsUint8 = pbkdf2Hmac({
     hmac: (key, msg) => hmacSha512(key, msg),
     hashLen: 64, // SHA-512 output bytes
     password: joinedMnemonic,
@@ -24,16 +25,24 @@ export function secureGenerateKeyGen({ passphrase = "", mnemonic = null }) {
     dkLen: 64, // BIP39 seed length
   });
 
-  const parseToHex = (unparsed) =>
-    [...unparsed].map((b) => b.toString(16).padStart(2, "0")).join("");
-
-  const { privateKey, publicKey } = keypairFromSeed(seed, "app:v1:encryption");
+  const hexSeed = convertUint8ToHex(seedAsUint8);
 
   return {
     mnemonic,
-    seed: parseToHex(seed),
-    privateKey: parseToHex(privateKey),
-    publicKey: parseToHex(publicKey),
+    ...secureGenerateKeyGenFromSeed({ hexSeed }),
+  };
+}
+
+export function secureGenerateKeyGenFromSeed({ hexSeed }) {
+  const { privateKey, publicKey } = keypairFromSeed(
+    hexSeed,
+    "app:v1:encryption",
+  );
+
+  return {
+    seed: convertUint8ToHex(hexSeed),
+    privateKey: convertUint8ToHex(privateKey),
+    publicKey: convertUint8ToHex(publicKey),
   };
 }
 
@@ -59,14 +68,11 @@ function utf8Bytes(s) {
   return new Uint8Array(out);
 }
 
-function keypairFromSeed(seed64, context = "app:v1:asym-ec-secp256k1") {
-  if (!(seed64 instanceof Uint8Array) || seed64.length !== 64) {
-    throw new Error("seed64 must be Uint8Array(64)");
-  }
-
+function keypairFromSeed(seedAsHex, context = "app:v1:asym-ec-secp256k1") {
+  const seedAsUint8 = convertHexToUint8(seedAsHex);
   const label = utf8Bytes(context);
 
-  const I = hmacSha512(label, seed64); // 64B
+  const I = hmacSha512(label, seedAsUint8); // 64B
   const k0 = bytesToBigInt(I.slice(0, 32));
 
   const n = CURVE_N;

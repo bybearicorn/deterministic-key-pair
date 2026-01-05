@@ -1,4 +1,4 @@
-import { generateKeyPairFromMnemonic } from "./src/exports.js";
+import { generateKeyPairFromMnemonic } from "../src/exports.js";
 
 const mnemonic = [
   "antenna",
@@ -16,6 +16,8 @@ const mnemonic = [
 ];
 
 const instance = generateKeyPairFromMnemonic({ mnemonic });
+
+console.log(instance);
 
 // {
 //   mnemonic: [
