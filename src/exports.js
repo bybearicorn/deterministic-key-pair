@@ -12,25 +12,25 @@ export function generateKeyPairFromMnemonic({ mnemonic, passphrase }) {
   return secureGenerateKeyGen({ mnemonic, passphrase });
 }
 
-console.info(
-  generateKeyPairFromMnemonic({
-    mnemonic: [
-      "antenna",
-      "clay",
-      "silly",
-      "page",
-      "mesh",
-      "dizzy",
-      "devote",
-      "venture",
-      "logic",
-      "tornado",
-      "mouse",
-      "athlete",
-    ],
-  }),
-);
+// console.info(
+//   generateKeyPairFromMnemonic({
+//     mnemonic: [
+//       "antenna",
+//       "clay",
+//       "silly",
+//       "page",
+//       "mesh",
+//       "dizzy",
+//       "devote",
+//       "venture",
+//       "logic",
+//       "tornado",
+//       "mouse",
+//       "athlete",
+//     ],
+//   }),
+// );
 
-export function getKeyPairFromSeed({ seed }) {
-  return secureGenerateKeyGenFromSeed({ seed });
+export function getKeyPairFromSeed({ hexSeed }) {
+  return secureGenerateKeyGenFromSeed({ hexSeed });
 }

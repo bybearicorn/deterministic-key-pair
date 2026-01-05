@@ -34,13 +34,17 @@ export function secureGenerateKeyGen({ passphrase = "", mnemonic = null }) {
 }
 
 export function secureGenerateKeyGenFromSeed({ hexSeed }) {
+  if (typeof hexSeed !== "string" || !/^[0-9a-fA-F]{128}$/.test(hexSeed)) {
+    throw new Error("hexSeed must be a 64-byte hex string (128 hex chars)");
+  }
+
   const { privateKey, publicKey } = keypairFromSeed(
     hexSeed,
     "app:v1:encryption",
   );
 
   return {
-    seed: convertUint8ToHex(hexSeed),
+    seed: hexSeed,
     privateKey: convertUint8ToHex(privateKey),
     publicKey: convertUint8ToHex(publicKey),
   };
