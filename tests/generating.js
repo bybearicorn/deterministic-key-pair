@@ -44,7 +44,7 @@ test("generating key pair from mnemonic of 18 without passphrase", () => {
   assert.equal(out.publicKey, "021ae759f6b481ee8272da110a9321202789d8921135e66b3a81c1892c0331488c");
 });
 
-test("generating key pair from mnemonic of 18 without passphrase", () => {
+test("generating key pair from mnemonic of 18 with passphrase", () => {
   const passphrase = "helloworld";
   const mnemonic = ["test", "suit", "rice", "cinnamon", "possible", "deposit", "harsh", "wage", "cannon", "noble", "equip", "exotic", "mother", "august", "flower", "until", "vacant", "sell"];
   const out = generateKeyPairFromMnemonic({ mnemonic, passphrase });
