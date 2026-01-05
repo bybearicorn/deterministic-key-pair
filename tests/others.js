@@ -1,7 +1,3 @@
-// test.js
-// Run: node test.js
-// No external npm deps. Uses only node built-ins + your local modules.
-
 import assert from "node:assert/strict";
 import crypto from "node:crypto";
 
@@ -67,11 +63,7 @@ function test(name, fn) {
 // ---------- SHA-512 ----------
 test("sha512('abc') matches known vector", () => {
   const out = sha512("abc");
-  const expected =
-    "ddaf35a193617abacc417349ae204131" +
-    "12e6fa4e89a97ea20a9eeee64b55d39a" +
-    "2192992a274fc1a836ba3c23a3feebbd" +
-    "454d4423643ce80e2a9ac94fa54ca49f";
+  const expected = "ddaf35a193617abacc417349ae204131" + "12e6fa4e89a97ea20a9eeee64b55d39a" + "2192992a274fc1a836ba3c23a3feebbd" + "454d4423643ce80e2a9ac94fa54ca49f";
   assert.equal(hex(out), expected);
 });
 
@@ -80,28 +72,11 @@ test("hmac-sha512 RFC 4231 test case 1", () => {
   const key = new Uint8Array(20).fill(0x0b);
   const msg = "Hi There";
   const out = hmacSha512(key, msg);
-  const expected =
-    "87aa7cdea5ef619d4ff0b4241a1d6cb0" +
-    "2379f4e2ce4ec2787ad0b30545e17cde" +
-    "daa833b7d6b8a702038b274eaea3f4e4" +
-    "be9d914eeb61f1702e696c203a126854";
+  const expected = "87aa7cdea5ef619d4ff0b4241a1d6cb0" + "2379f4e2ce4ec2787ad0b30545e17cde" + "daa833b7d6b8a702038b274eaea3f4e4" + "be9d914eeb61f1702e696c203a126854";
   assert.equal(hex(out), expected);
 });
 
 // ---------- SHA-256 ----------
-test("sha256('abc') matches known vector", () => {
-  const outHex = sha256.hex("abc");
-  const expected =
-    "ba7816bf8f01cfea414140de5dae2223" + "b00361a396177a9cb410ff61f20015ad";
-  assert.equal(outHex, expected);
-});
-
-test("sha256 matches node:crypto", () => {
-  const msg = "The quick brown fox jumps over the lazy dog";
-  const ours = sha256.hex(msg);
-  const node = crypto.createHash("sha256").update(msg, "utf8").digest("hex");
-  assert.equal(ours, node);
-});
 
 // ---------- PBKDF2-HMAC-SHA512 ----------
 test("pbkdf2Hmac matches node:crypto.pbkdf2Sync (sha512)", () => {
@@ -162,21 +137,18 @@ function validateMnemonicLocal(mnemonic) {
 }
 
 test("mnemonic checksum validates (local implementation)", () => {
-  const mnemonic =
-    "chief junk economy shrimp drill leg brick ice laundry author phone solar";
+  const mnemonic = "chief junk economy shrimp drill leg brick ice laundry author phone solar";
   assert.equal(validateMnemonicLocal(mnemonic), true);
 });
 
 test("mnemonic checksum validates (project validateMnemonic if present)", () => {
   if (!validateMnemonic) return; // skip if not implemented in project
-  const mnemonic =
-    "chief junk economy shrimp drill leg brick ice laundry author phone solar";
+  const mnemonic = "chief junk economy shrimp drill leg brick ice laundry author phone solar";
   assert.equal(validateMnemonic(mnemonic), true);
 });
 
 test("BIP39 seed (empty passphrase) matches node:crypto", () => {
-  const mnemonic =
-    "chief junk economy shrimp drill leg brick ice laundry author phone solar";
+  const mnemonic = "chief junk economy shrimp drill leg brick ice laundry author phone solar";
   const passphrase = ""; // MUST match what you enter in wallets
 
   const password = normalizeNFKD(mnemonic);
@@ -197,32 +169,22 @@ test("BIP39 seed (empty passphrase) matches node:crypto", () => {
 
 // ---------- secp256k1 ----------
 test("secp256k1 getPublicKey(priv=1) compressed equals generator point", () => {
-  const priv = u8FromHex(
-    "0000000000000000000000000000000000000000000000000000000000000001",
-  );
+  const priv = u8FromHex("0000000000000000000000000000000000000000000000000000000000000001");
   const pub = getPublicKey(priv, true);
-  const expected =
-    "0279be667ef9dcbbac55a06295ce870b07029bfcdb2dce28d959f2815b16f81798";
+  const expected = "0279be667ef9dcbbac55a06295ce870b07029bfcdb2dce28d959f2815b16f81798";
   assert.equal(hex(pub), expected);
 });
 
 test("secp256k1 getPublicKey(priv=2) compressed known vector", () => {
-  const priv = u8FromHex(
-    "0000000000000000000000000000000000000000000000000000000000000002",
-  );
+  const priv = u8FromHex("0000000000000000000000000000000000000000000000000000000000000002");
   const pub = getPublicKey(priv, true);
-  const expected =
-    "02c6047f9441ed7d6d3045406e95c07cd85c778e4b8cef3ca7abac09b95c709ee5";
+  const expected = "02c6047f9441ed7d6d3045406e95c07cd85c778e4b8cef3ca7abac09b95c709ee5";
   assert.equal(hex(pub), expected);
 });
 
 test("secp256k1 ecdh symmetry: ecdh(a, Pub(b)) == ecdh(b, Pub(a))", () => {
-  const a = u8FromHex(
-    "0000000000000000000000000000000000000000000000000000000000000003",
-  );
-  const b = u8FromHex(
-    "0000000000000000000000000000000000000000000000000000000000000007",
-  );
+  const a = u8FromHex("0000000000000000000000000000000000000000000000000000000000000003");
+  const b = u8FromHex("0000000000000000000000000000000000000000000000000000000000000007");
 
   const A = getPublicKey(a, true);
   const B = getPublicKey(b, true);

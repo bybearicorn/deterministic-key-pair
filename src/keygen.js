@@ -3,9 +3,9 @@ import { hmac as hmacSha512 } from "./libs/sha512.js";
 import { getPublicKey, CURVE_N } from "./libs/secp256k1.js";
 import { convertUint8ToHex, convertHexToUint8 } from "./libs/convert.js";
 
-export function secureGenerateKeyGen({ passphrase = "", mnemonic = null }) {
+export function getKeyGen({ passphrase = "", mnemonic = null }) {
   if (!mnemonic) {
-    throw new Error("Mnemonic is required for using secureGenerateKeyGen");
+    throw new Error("Mnemonic is required for using getKeyGen");
   }
 
   if (typeof passphrase !== "string") {
@@ -29,19 +29,16 @@ export function secureGenerateKeyGen({ passphrase = "", mnemonic = null }) {
 
   return {
     mnemonic,
-    ...secureGenerateKeyGenFromSeed({ hexSeed }),
+    ...getKeyGenFromSeed({ hexSeed }),
   };
 }
 
-export function secureGenerateKeyGenFromSeed({ hexSeed }) {
+export function getKeyGenFromSeed({ hexSeed }) {
   if (typeof hexSeed !== "string" || !/^[0-9a-fA-F]{128}$/.test(hexSeed)) {
     throw new Error("hexSeed must be a 64-byte hex string (128 hex chars)");
   }
 
-  const { privateKey, publicKey } = keypairFromSeed(
-    hexSeed,
-    "app:v1:encryption",
-  );
+  const { privateKey, publicKey } = keypairFromSeed(hexSeed, "app:v1:encryption");
 
   return {
     seed: hexSeed,
